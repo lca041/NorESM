@@ -55,7 +55,7 @@ and in the Run folder::
   <RUN_DIR>/case/run/lnd_in
 
 
-Spin up of CLM5 
+Stand alone spin up of CLM5 
 ^^^^^^
 A long spin up of CLM5 is necessary to achive e.g. land carbon balance. Such a spin up can be done partly uncoupled from NorESM2 in order to save computation time.
 
@@ -80,15 +80,21 @@ To generate forcing data from the coupled simulation to run CLM5 stand alone wit
 ::
 
 **Running CLM stand alone with NorESM2 forcing data**
-PLEASE ADD 
 
-- Which compset and resolution to use
+The stand along CLM spinup case is created in the same way as coupled simulation, while with the compset for land-only simulations (see above). The spatial resolution of CLM5 stand alone spin up should be set as the same as the CMIP6 (f09_tn14 for NorESM2-MM and f19_tn14 for NorESM2-LM). The compsets should be set as land-only mode ``I1850Clm50BgcCropCmip6``. For example, to create a new case on Fram, 
+::
 
-- How to create a case::
-  
-- Where to put the forcing data and the link to the location for the model to read
+./create_newcase --case <PAT_TO_CASEFOLDER>/CASENAME --compset I1850clm50BgcCropCmip6 --res f19_t14 --mach fram --project nn9560k
 
-- ++
+::
+
+To force CLM using the atmospheric variables in the NorESM2 output, CPLHISTForcing data mode is activated with customized DATM settings. In ``CPLHISTForcing`` mode, the model is assumed to have 3-hourly for a global grid from a previous simulation. 
+The data atmosphere (datm) data is divided into three streams: precipitation, solar, and everything else. The ``offset`` needs to be set in the datm.streams files in order to adjust the time-stamps to what it needs to be for the ``tintalgo`` settings. 
+For precipitation ``tintalgo`` is set to ``nearest`` so the ``offset`` is set to ``-5400`` seconds so that the ending time-step is adjusted by an hour and half to the middle of the interval. 
+For solar ``tintalgo`` is set to ``coszen`` so the offset is set to ``-10800`` seconds so that the ending time-step is adjust by three hours to the beginning of the interval. 
+For everything else ``tintalgo`` is set to ``linear`` so the offset is set to ``-5400`` seconds so that the ending time-step is adjusted by an hour and half to the middle of the interval. 
+
+The link to history files as the datm forcing is set also by editing the datm.streams files. 
 
 **Recoupling**
 
